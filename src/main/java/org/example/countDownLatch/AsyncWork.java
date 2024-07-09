@@ -1,4 +1,4 @@
-package org.example.syncThreads;
+package org.example.countDownLatch;
 
 import java.util.concurrent.CountDownLatch;
 
