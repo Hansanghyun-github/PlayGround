@@ -25,7 +25,6 @@ class SynchronizedClassTest {
     SynchronizedClass synchronizedClass;
     @Spy
     NormalClass normalClass;
-    CountDownLatch latch = new CountDownLatch(2);
     BlockingQueue<Integer> queue = new LinkedBlockingDeque<>();
 
     @Test
@@ -37,7 +36,6 @@ class SynchronizedClassTest {
             synchronized (this){
                 Thread.sleep(3000);
                 queue.put(1);
-                latch.countDown();
             }
             return null;
         }).when(synchronizedClass).method1();
@@ -46,15 +44,15 @@ class SynchronizedClassTest {
             Thread.sleep(1000);
             synchronized (this){
                 queue.put(2);
-                latch.countDown();
             }
             return null;
         }).when(synchronizedClass).method2();
 
         // when
-        executorService.submit(() -> synchronizedClass.method1());
-        executorService.submit(() -> synchronizedClass.method2());
-        latch.await();
+        Future<?> submit1 = executorService.submit(() -> synchronizedClass.method1());
+        Future<?> submit2 = executorService.submit(() -> synchronizedClass.method2());
+        submit1.get();
+        submit2.get();
 
         // then
         assertThat(queue.poll()).isEqualTo(1);
@@ -63,7 +61,5 @@ class SynchronizedClassTest {
         // verify call method1 -> method2 order
 
     }
-
-    // 멀티스레딩 환경에서, 특정 스레드가 무조건 먼저 실행됨을 어떻게 보장할 수 있을까
 
 }
