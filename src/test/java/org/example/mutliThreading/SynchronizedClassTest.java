@@ -1,18 +1,17 @@
 package org.example.mutliThreading;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
-import org.mockito.MockitoAnnotations;
+import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Queue;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,44 +21,88 @@ import static org.mockito.Mockito.*;
 class SynchronizedClassTest {
 
     @Spy
+    InternalClass internalClass;
+
+    @InjectMocks
     SynchronizedClass synchronizedClass;
-    @Spy
-    NormalClass normalClass;
     BlockingQueue<Integer> queue = new LinkedBlockingDeque<>();
 
     @Test
-    void synchronized_키워드가_붙으면_메서드의_순서를_보장한다() throws Exception {
+    void sleep을_이용해_스레드_순서_설정() throws Exception {
         // given
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
         doAnswer(invocation -> {
-            synchronized (this){
-                Thread.sleep(3000);
-                queue.put(1);
-            }
+            System.out.println("override internalMethod1");
+            Thread.sleep(1000);
             return null;
-        }).when(synchronizedClass).method1();
+        }).when(internalClass).internalMethod1();
 
         doAnswer(invocation -> {
-            Thread.sleep(1000);
-            synchronized (this){
-                queue.put(2);
-            }
+            System.out.println("override internalMethod2");
             return null;
-        }).when(synchronizedClass).method2();
+        }).when(internalClass).internalMethod2();
 
         // when
-        Future<?> submit1 = executorService.submit(() -> synchronizedClass.method1());
-        Future<?> submit2 = executorService.submit(() -> synchronizedClass.method2());
-        submit1.get();
-        submit2.get();
+        Future<?> future1 = executorService.submit(() -> {
+            synchronizedClass.method1();
+            queue.add(1);
+        });
+        Future<?> future2 = executorService.submit(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            synchronizedClass.method2();
+            queue.add(2);
+        });
+        future1.get();
+        future2.get();
 
         // then
         assertThat(queue.poll()).isEqualTo(1);
         assertThat(queue.poll()).isEqualTo(2);
+    }
 
-        // verify call method1 -> method2 order
+    @Test
+    void CountDownLatch를_이용해_스레드_순서_설정() throws Exception {
+        // given
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        CountDownLatch latch = new CountDownLatch(1);
 
+        doAnswer(invocation -> {
+            latch.countDown();
+            System.out.println("override internalMethod1");
+            Thread.sleep(500); // 의도적으로 0.5초 대기
+            return null;
+        }).when(internalClass).internalMethod1();
+
+        doAnswer(invocation -> {
+            System.out.println("override internalMethod2");
+            return null;
+        }).when(internalClass).internalMethod2();
+
+        // when
+        Future<?> future1 = executorService.submit(() -> {
+            synchronizedClass.method1();
+            queue.add(1);
+        });
+        Future<?> future2 = executorService.submit(() -> {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            synchronizedClass.method2();
+            queue.add(2);
+        });
+        future1.get();
+        future2.get();
+
+        // then
+        assertThat(queue.poll()).isEqualTo(1);
+        assertThat(queue.poll()).isEqualTo(2);
     }
 
 }
