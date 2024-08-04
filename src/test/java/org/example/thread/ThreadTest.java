@@ -93,7 +93,7 @@ class ThreadTest {
     @Test
     void BLOCKED_state_test() throws Exception {
         // given
-        ReentrantLock lock = new ReentrantLock();
+        Object lock = new Object();
         Thread thread1 = new Thread(() -> {
             synchronized (lock){
                 sleep(1000);
