@@ -8,4 +8,11 @@ public class ThreadUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static class DaemonThread extends Thread {
+        public DaemonThread(Runnable runnable) {
+            super(runnable);
+            setDaemon(true);
+        }
+    }
 }
