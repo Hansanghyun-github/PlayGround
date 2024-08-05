@@ -1,4 +1,4 @@
-package org.example.thread;
+package org.example.mutliThreading;
 
 import org.assertj.core.api.Assertions;
 import org.example.util.ThreadUtils;

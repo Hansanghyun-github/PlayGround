@@ -1,4 +1,4 @@
-package org.example.thread;
+package org.example.mutliThreading;
 
 
 import org.assertj.core.api.Assertions;
@@ -115,6 +115,7 @@ class ThreadTest {
         assertThat(thread2.getState()).isEqualTo(BLOCKED);
     }
 
-    // todo 왜 lock.lock()은 WAITING 인거지?
+    // todo 왜 lock.lock()은 WAITING 인거지? -> 그냥 synchronized 블록과 같은 것이다.
+    // synchronized 키워드에 의해 BLOCKED 됨, lock 은 내부적으로 직접 구현한 것이라서 WAITING 상태가 나온다.
 
 }
