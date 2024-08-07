@@ -20,7 +20,7 @@ public class ThreadUtils {
     }
 
     public static void log(String message) {
-        System.out.println(LocalTime.now() + " " + Thread.currentThread().getName() + ": " + message);
+        System.out.println(String.format("[%-6s %10s] %s", LocalTime.now(), Thread.currentThread().getName(), message));
 
     }
 }
