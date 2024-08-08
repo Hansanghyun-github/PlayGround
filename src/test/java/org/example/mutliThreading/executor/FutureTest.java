@@ -1,8 +1,6 @@
-package org.example.mutliThreading.future;
+package org.example.mutliThreading.executor;
 
-import org.assertj.core.api.Assertions;
 import org.example.util.ExecutorUtils;
-import org.example.util.ThreadUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;

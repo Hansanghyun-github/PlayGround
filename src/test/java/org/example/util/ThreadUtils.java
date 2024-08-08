@@ -23,4 +23,20 @@ public class ThreadUtils {
         System.out.println(String.format("[%-6s %10s] %s", LocalTime.now(), Thread.currentThread().getName(), message));
 
     }
+
+    public static class RunnableTask implements Runnable {
+
+        long count;
+
+        public RunnableTask(long count) {
+            this.count = count;
+        }
+
+        @Override
+        public void run() {
+            log("Task start");
+            sleep(count);
+            log("Task end");
+        }
+    }
 }
