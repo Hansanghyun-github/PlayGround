@@ -1,5 +1,7 @@
 package org.example.util;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -24,19 +26,26 @@ public class ThreadUtils {
 
     }
 
+    @Getter
     public static class RunnableTask implements Runnable {
 
         long count;
+        String name = "";
 
         public RunnableTask(long count) {
             this.count = count;
         }
 
+        public RunnableTask(long count, String name) {
+            this.count = count;
+            this.name = name;
+        }
+
         @Override
         public void run() {
-            log("Task start");
+            log(name + " task start");
             sleep(count);
-            log("Task end");
+            log(name + " task end");
         }
     }
 }

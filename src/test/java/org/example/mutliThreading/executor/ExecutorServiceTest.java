@@ -151,4 +151,138 @@ public class ExecutorServiceTest {
         }
     }
 
+    @Nested
+    class ThreadPoolManagement {
+        @Test
+        void before_task_service_thread_pool_is_empty() throws Exception {
+            // when
+            ExecutorService service = Executors.newFixedThreadPool(2);
+            sleep(500);
+
+            // then
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) service;
+            assertThat(executor.getPoolSize()).isZero();
+        }
+
+        @Test
+        void Executors_newFixedThreadPool_is_fixed_thread_size() throws Exception {
+            // given
+            ExecutorService service = Executors.newFixedThreadPool(2);
+
+            // then
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) service;
+            assertThat(executor.getCorePoolSize())
+                    .isEqualTo(executor.getMaximumPoolSize());
+        }
+        
+        @Test
+        void if_task_overflow_queue_new_thread_is_created() throws Exception {
+            // given
+            ExecutorService es = new ThreadPoolExecutor(2, 4,
+                    3000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2));
+            RunnableTask task = new RunnableTask(2000L);
+            for(int i = 0; i < 4; i++) {
+                es.execute(task);
+            }
+            sleep(500);
+            assertThat(((ThreadPoolExecutor) es).getPoolSize()).isEqualTo(2);
+            
+            // when
+            es.execute(task);
+            sleep(500);
+
+            // then
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) es;
+            assertThat(executor.getPoolSize()).isEqualTo(3);
+        }
+
+        @Test
+        void es_create_new_thread_until_max_pool_size() throws Exception {
+            // given
+            ExecutorService es = new ThreadPoolExecutor(2, 4,
+                    3000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2));
+            for(int i = 0; i < 4; i++) {
+                es.execute(new RunnableTask(2000L, "name" + i));
+            }
+
+            // when
+            sleep(500);
+            es.execute(new RunnableTask(2000L, "name4"));
+            es.execute(new RunnableTask(2000L, "name5"));
+
+            // then
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) es;
+            assertThat(executor.getPoolSize()).isEqualTo(4);
+        }
+
+        @Test
+        void if_queue_is_full_new_thread_proceed_recent_task() throws Exception {
+            // given
+            ExecutorService es = new ThreadPoolExecutor(2, 4,
+                    3000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2));
+            for(int i = 0; i < 4; i++) {
+                es.execute(new RunnableTask(2000L, "name" + i));
+            }
+
+            // when
+            sleep(500);
+            es.execute(new RunnableTask(2000L, "name4"));
+
+            // then
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) es;
+            BlockingQueue<Runnable> queue = executor.getQueue();
+            assertThat(queue)
+                    .extracting("name")
+                    .doesNotContain("name4");
+        }
+        
+        @Test
+        void if_pool_and_queue_are_full_new_task_is_rejected() throws Exception {
+            // given
+            ExecutorService es = new ThreadPoolExecutor(2, 4,
+                    3000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2));
+            for(int i = 0; i < 6; i++) {
+                es.execute(new RunnableTask(2000L, "name" + i));
+            }
+            sleep(500);
+            
+            // when // then
+            assertThatThrownBy(() -> es.execute(new RunnableTask(2000L, "name6")))
+                    .isInstanceOf(RejectedExecutionException.class);
+        }
+        
+        @Test
+        void if_created_additional_thread_does_not_work_then_remove() throws Exception {
+            // given
+            ExecutorService es = new ThreadPoolExecutor(2, 4,
+                    100, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2));
+            for(int i = 0; i < 6; i++) {
+                es.execute(new RunnableTask(1000L, "name" + i));
+            }
+            sleep(500);
+            assertThat(((ThreadPoolExecutor) es).getPoolSize()).isEqualTo(4);
+            
+            // when
+            sleep(1000);
+            
+            // then
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) es;
+            assertThat(executor.getPoolSize()).isEqualTo(2);
+        }
+        
+        @Test
+        void prestartAllCoreThreads_method_create_threads_if_task_is_not_entered() throws Exception {
+            // given
+            ExecutorService es = new ThreadPoolExecutor(2, 4,
+                    100, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2));
+            
+            // when
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) es;
+            executor.prestartAllCoreThreads();
+            
+            // then
+            assertThat(executor.getPoolSize()).isEqualTo(2);
+        }
+    }
+
 }
