@@ -1,7 +1,5 @@
 package org.example.mutliThreading;
 
-import org.assertj.core.api.Assertions;
-import org.example.util.ThreadUtils;
 import org.junit.jupiter.api.Test;
 
 import static java.lang.Thread.State.*;

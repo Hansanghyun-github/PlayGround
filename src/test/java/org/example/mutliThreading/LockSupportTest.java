@@ -1,6 +1,5 @@
 package org.example.mutliThreading;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.locks.LockSupport;

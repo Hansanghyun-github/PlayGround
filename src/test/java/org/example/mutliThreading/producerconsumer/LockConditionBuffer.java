@@ -1,7 +1,5 @@
 package org.example.mutliThreading.producerconsumer;
 
-import org.example.util.ThreadUtils;
-
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;

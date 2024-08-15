@@ -3,9 +3,6 @@ package org.example.mutliThreading;
 import org.example.mutliThreading.producerconsumer.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-
 import static org.example.util.ThreadUtils.*;
 
 public class ProducerConsumerTest {

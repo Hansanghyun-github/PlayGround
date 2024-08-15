@@ -1,12 +1,7 @@
 package org.example.mutliThreading;
 
 
-import org.assertj.core.api.Assertions;
-import org.example.util.ThreadUtils;
 import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Thread.State.*;
 import static org.assertj.core.api.Assertions.*;

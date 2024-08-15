@@ -1,7 +1,5 @@
 package org.example.mutliThreading.producerconsumer;
 
-import org.example.util.ThreadUtils;
-
 import static org.example.util.ThreadUtils.*;
 
 public class ProducerTask implements Runnable {

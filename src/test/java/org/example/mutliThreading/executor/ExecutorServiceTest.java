@@ -1,11 +1,8 @@
 package org.example.mutliThreading.executor;
 
-import org.assertj.core.api.Assertions;
-import org.example.util.ExecutorUtils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.security.PrivilegedAction;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
