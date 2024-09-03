@@ -6,7 +6,7 @@ import java.util.List;
 public class OutOfMemoryExample {
     public static void main(String[] args) throws InterruptedException {
         // have to set -Xmx256m option
-        Thread.sleep(10000);
+        // when you want to make heap dump file, you can set -XX:+HeapDumpOnOutOfMemoryError option
 
         // make OutOfMemoryError
         System.out.println("Start to make OutOfMemoryError");
