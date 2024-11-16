@@ -1,6 +1,5 @@
 package org.example.iterator;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
@@ -127,6 +126,21 @@ class ListIteratorTest {
         }
 
         // when // then
+        li.remove();
+        System.out.println(list);
+    }
+
+    @Test
+    void remove_메서드는_최근에_이동했던_위치의_원소를_제거한다() throws Exception {
+        // given
+        List<Integer> list = new LinkedList<>(List.of(1, 2, 3, 4, 5, 6));
+        ListIterator<Integer> li = list.listIterator();
+
+        // when
+        li.next();
+        li.previous();
+
+        // then
         li.remove();
         System.out.println(list);
     }
