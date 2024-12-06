@@ -38,4 +38,30 @@ public class TryBlockTest {
         assertThatThrownBy(br::readLine)
                 .isInstanceOf(IOException.class);
     }
+
+    @Test
+    void close_with_try_with_resource_block() throws Exception {
+        // given
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        // when
+        try (br) {
+            // readLine not throw exception
+        }
+
+        // then
+        assertThatThrownBy(br::readLine)
+                .isInstanceOf(IOException.class);
+    }
+
+    @Test
+    void close_with_try_with_resource_block2() throws Exception {
+        // when // then
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+            // readLine not throw exception
+        }
+
+        // br is not accessible
+        // br.readLine();
+    }
 }
